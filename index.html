@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Special Gift for Sofi ✨</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            fredoka: ['"Plus Jakarta Sans"', 'sans-serif'],
+            quicksand: ['"Plus Jakarta Sans"', 'sans-serif'],
+            jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+            playfair: ['"Playfair Display"', 'serif'],
+          },
+          colors: {
+            sofi: {
+              pink: '#FF7495',
+              deepPink: '#E84A74',
+              rose: '#FB7185',
+              softPink: '#FFE5EC',
+              blush: '#FFF0F3',
+              cream: '#FFFDF9',
+              yellow: '#FFD166',
+              purple: '#9B5DE5',
+              dark: '#2B2D42',
+            }
+          },
+          animation: {
+            'bounce-slow': 'bounce 2.5s infinite',
+            'spin-slow': 'spin 8s linear infinite',
+            'wiggle': 'wiggle 0.5s ease-in-out infinite',
+            'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            wiggle: {
+              '0%, 100%': { transform: 'rotate(-4deg)' },
+              '50%': { transform: 'rotate(4deg)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  
+  <!-- YouTube IFrame Player API -->
+  <script async src="https://www.youtube.com/iframe_api"></script>
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body id="page-body" class="bg-gradient-to-br from-pink-100 via-purple-50 to-amber-50 min-h-screen text-slate-800 font-quicksand overflow-x-hidden selection:bg-pink-300 selection:text-pink-900 transition-colors duration-1000">
+
+  <!-- Floating Background Decorative Elements -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10" id="bg-decorations">
+    <div class="floating-bubble bubble-1">💖</div>
+    <div class="floating-bubble bubble-2">✨</div>
+    <div class="floating-bubble bubble-3">🥟</div>
+    <div class="floating-bubble bubble-4">🌸</div>
+    <div class="floating-bubble bubble-5">⭐</div>
+  </div>
+
+  <!-- Audio Toggle / Sound Effect Status (Stage 1 & 2) -->
+  <div id="sound-toggle-container" class="fixed top-4 right-4 z-50">
+    <button id="sound-toggle" class="bg-white/80 backdrop-blur-md px-3.5 py-2 rounded-full shadow-md hover:shadow-lg transition-all text-xs font-semibold flex items-center gap-1.5 border border-pink-200 text-pink-700">
+      <span id="sound-icon">🔊</span> <span id="sound-text">Audio ON</span>
+    </button>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAHAP 1: MINI GAME (TANGKAP RISOL MAYO)   -->
+  <!-- ========================================== -->
+  <section id="stage-game" class="min-h-screen flex flex-col items-center justify-center p-4 transition-all duration-700">
+    <div class="w-full max-w-lg bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-6 sm:p-8 border-4 border-pink-200 text-center relative overflow-hidden">
+      
+      <!-- Badge Header -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-100 text-pink-700 text-xs sm:text-sm font-bold uppercase tracking-wider mb-4">
+        <span>🎮 Mini Game</span>
+      </div>
+
+      <!-- Score & Status Bar -->
+      <div class="flex items-center justify-between bg-pink-50 rounded-2xl px-4 py-2.5 mb-4 border border-pink-200">
+        <div class="flex items-center gap-2">
+          <img src="sofi.png" alt="Sofi" class="w-8 h-8 rounded-full border border-pink-300 shadow-sm object-cover object-top" />
+          <span class="font-bold text-slate-700">Wajah Tertangkap:</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span id="score-counter" class="text-2xl font-extrabold text-pink-600">0</span>
+          <span class="text-lg text-slate-400">/ 5</span>
+        </div>
+      </div>
+
+      <!-- Game Canvas Container -->
+      <div class="relative w-full h-80 sm:h-96 bg-gradient-to-b from-sky-100 via-pink-50 to-amber-50 rounded-2xl border-2 border-pink-100 overflow-hidden shadow-inner cursor-grab active:cursor-grabbing select-none" id="game-container">
+        
+        <!-- Game Area Canvas -->
+        <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+
+        <!-- Overlay Start / Click to begin -->
+        <div id="game-start-overlay" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 transition-opacity duration-300">
+          <img src="sofi.png" alt="Sofi" class="w-24 h-24 rounded-full border-4 border-pink-400 shadow-xl mb-3 animate-bounce object-cover object-top" />
+          <h2 class="text-xl font-bold text-slate-800 mb-4">Tangkap Wajah Cantik Sofi ✨</h2>
+          <button id="btn-start-game" class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-base px-7 py-3 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+            Mulai Main 🚀
+          </button>
+        </div>
+
+        <!-- Success Overlay -->
+        <div id="game-win-overlay" class="absolute inset-0 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-500">
+          <div class="text-5xl mb-2 animate-bounce">🎉👧🏻🥳</div>
+          <h2 class="text-2xl font-bold text-pink-600 mb-1">HORE BERHASIL! 🥳</h2>
+          <p class="text-sm font-medium text-slate-600 mb-4">
+            5 Wajah cantik Sofi berhasil kamu tangkap semua! Sekarang saatnya lanjut ke pertanyaan...
+          </p>
+          <button id="btn-next-to-quiz" class="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-base px-8 py-3 rounded-full shadow-lg hover:scale-105 transition-all flex items-center gap-2">
+            Lanjut ke Pertanyaan ➡️
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-3 flex items-center justify-center gap-4 text-xs text-slate-400">
+        <span>💡 Tips: Geser mouse/jari ke kiri & kanan</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- TAHAP 2: KUIS 2 PERTANYAAN INTERAKTIF     -->
+  <!-- ========================================== -->
+  <section id="stage-quiz" class="min-h-screen hidden flex-col items-center justify-center p-4 transition-all duration-700">
+    <div class="w-full max-w-xl bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 sm:p-10 border-4 border-pink-200 relative">
+      
+      <!-- Progress Dots -->
+      <div class="flex items-center justify-end mb-6">
+        <div class="flex items-center gap-1.5">
+          <span id="dot-q1" class="w-3 h-3 rounded-full bg-pink-500 transition-all duration-300"></span>
+          <span id="dot-q2" class="w-3 h-3 rounded-full bg-slate-200 transition-all duration-300"></span>
+        </div>
+      </div>
+
+      <!-- PERTANYAAN 1 -->
+      <div id="quiz-q1" class="transition-all duration-500">
+        <div class="text-center mb-6">
+          <span class="text-4xl inline-block mb-2 animate-bounce-slow">🧐</span>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug">
+            Apa makanan danus yang identik dengan Sofi saat SMA yang laris manis poll mantab?
+          </h2>
+        </div>
+
+        <form id="form-q1" class="space-y-4">
+          <div class="relative">
+            <input 
+              type="text" 
+              id="input-q1" 
+              placeholder="Ketik nama makanannya di sini..." 
+              autocomplete="off"
+              class="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none text-base font-semibold text-slate-700 transition-all placeholder:text-slate-400 placeholder:font-normal text-center shadow-inner"
+            />
+          </div>
+
+          <!-- Error / Feedback Message -->
+          <div id="q1-error" class="hidden text-rose-500 text-xs sm:text-sm font-semibold text-center bg-rose-50 py-2.5 px-4 rounded-xl border border-rose-200">
+            <!-- Dynamic error message -->
+          </div>
+
+          <button 
+            type="submit" 
+            id="btn-submit-q1"
+            class="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-lg py-3 rounded-2xl shadow-lg hover:shadow-pink-300/50 hover:scale-[1.01] transition-all"
+          >
+            Kirim
+          </button>
+        </form>
+      </div>
+
+      <!-- PERTANYAAN 2 -->
+      <div id="quiz-q2" class="hidden transition-all duration-500">
+        <div class="text-center mb-6">
+          <span class="text-4xl inline-block mb-2 animate-pulse-fast">👑</span>
+          <h2 class="text-xl sm:text-2xl font-fredoka font-bold text-slate-800 leading-snug">
+            Satu kata yang identik dengan Sofi.
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-2">
+            Pilihlah dengan bijak dan gunakan hati nuranimu! 👀
+          </p>
+        </div>
+
+        <!-- Interactive Dynamic Button Area -->
+        <div id="q2-buttons-area" class="relative min-h-[220px] sm:min-h-[260px] flex items-center justify-center gap-6 p-4 rounded-2xl bg-gradient-to-r from-pink-50 via-purple-50 to-pink-50 border border-pink-100 overflow-hidden">
+          
+          <!-- Tombol Cantik (Bisa Membesar) -->
+          <button 
+            id="btn-cantik"
+            class="relative z-20 bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 hover:from-pink-600 hover:to-rose-700 text-white font-fredoka font-bold text-lg px-7 py-3 rounded-2xl shadow-xl transition-all duration-300 flex items-center gap-2 transform"
+          >
+            <span>✨ Cantik</span>
+          </button>
+
+          <!-- Tombol Jelek (Mengecil & Menghindar) -->
+          <button 
+            id="btn-jelek"
+            class="relative z-10 bg-slate-200 hover:bg-slate-300 text-slate-600 font-fredoka font-bold text-lg px-7 py-3 rounded-2xl shadow-md transition-all duration-200 cursor-pointer transform select-none"
+          >
+            <span>Jelek 😜</span>
+          </button>
+        </div>
+
+        <!-- Hint / Tease Text -->
+        <div class="mt-4 text-center min-h-[24px]">
+          <p id="jelek-tease" class="text-xs font-semibold text-pink-600 italic transition-all duration-300">
+            <!-- Dynamic tease line -->
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- TAHAP 3: HALAMAN KENANGAN SOFI (NUANSA SOFT PINK & AESTHETIC)  -->
+  <!-- ============================================================== -->
+  <section id="stage-memories" class="min-h-screen hidden flex-col w-full bg-gradient-to-b from-pink-50 via-rose-50/60 to-pink-100 text-slate-800 pb-28 relative">
+    
+    <!-- Floating Sparkles & Hearts Decor -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden -z-0 opacity-40">
+      <div class="star-dust star-1 text-pink-400">💖</div>
+      <div class="star-dust star-2 text-rose-300">🌸</div>
+      <div class="star-dust star-3 text-amber-300">✨</div>
+      <div class="star-dust star-4 text-pink-300">💫</div>
+    </div>
+
+    <!-- 1. STICKY TOP MUSIC PLAYER WIDGET -->
+    <header class="sticky top-0 z-40 bg-white/85 backdrop-blur-lg border-b border-pink-200/90 shadow-sm py-3 px-4 sm:px-8">
+      <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+        
+        <!-- Music Track Info & Spinning Vinyl Disk -->
+        <div class="flex items-center gap-3.5">
+          <!-- Vinyl Disk with cute pink label -->
+          <div class="relative w-12 h-12 rounded-full bg-slate-800 border-2 border-pink-300 flex items-center justify-center shadow-md group">
+            <div id="vinyl-disk" class="w-full h-full rounded-full flex items-center justify-center transition-all duration-500">
+              <!-- Vinyl grooves texture -->
+              <div class="w-8 h-8 rounded-full border border-slate-700 flex items-center justify-center">
+                <div class="w-4 h-4 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 border border-pink-200 flex items-center justify-center">
+                  <div class="w-1.5 h-1.5 rounded-full bg-slate-900"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Live Indicator Dot -->
+            <span id="music-indicator-dot" class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-slate-400 border border-white"></span>
+          </div>
+
+          <!-- Song Title -->
+          <div class="text-left">
+            <div class="flex items-center gap-2">
+              <h3 class="text-xs sm:text-sm font-semibold text-pink-600">
+                Putar lagunya biar romantis dikit beb 😘🎵
+              </h3>
+              <!-- Equalizer animation bars -->
+              <div id="equalizer-bars" class="hidden items-end gap-0.5 h-3">
+                <span class="eq-bar bar-1 bg-pink-500"></span>
+                <span class="eq-bar bar-2 bg-pink-500"></span>
+                <span class="eq-bar bar-3 bg-pink-500"></span>
+                <span class="eq-bar bar-4 bg-pink-500"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Play/Pause Button -->
+        <div class="flex items-center gap-2">
+          <button 
+            id="btn-play-music" 
+            class="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 hover:from-pink-600 hover:to-rose-700 text-white font-fredoka font-bold text-xs sm:text-sm shadow-md hover:shadow-pink-400/40 hover:scale-105 active:scale-95 transition-all"
+          >
+            <span id="play-icon" class="text-base">▶️</span>
+            <span id="play-text">Putar Musik</span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- 2. HERO / INTRO SECTION -->
+    <div class="max-w-4xl mx-auto px-4 pt-12 pb-8 text-center relative z-10">
+      
+      <!-- Pink Floral Ornament Header -->
+      <div class="inline-flex items-center justify-center gap-3 text-pink-500 mb-3">
+        <span class="h-[1.5px] w-8 sm:w-16 bg-gradient-to-r from-transparent to-pink-300"></span>
+        <span class="text-xs sm:text-sm font-fredoka tracking-widest uppercase text-pink-600 font-bold">🌸 Sesi Potret</span>
+        <span class="h-[1.5px] w-8 sm:w-16 bg-gradient-to-l from-transparent to-pink-300"></span>
+      </div>
+
+      <h1 class="text-2xl sm:text-4xl font-playfair font-bold text-slate-800 mb-2 leading-tight max-w-2xl mx-auto">
+        First of all, here are some photos that you might miss someday.
+      </h1>
+
+      <div class="w-24 h-1.5 bg-gradient-to-r from-transparent via-pink-400 to-transparent mx-auto mt-6 rounded-full"></div>
+    </div>
+
+    <!-- 3. PHOTO GALLERY SECTION (POLAROID & SCRAPBOOK STYLE) -->
+    <div class="max-w-5xl mx-auto px-4 pt-2 pb-8 relative z-10">
+
+      <!-- Polaroid Cards Grid (15 Photo Cards) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-6 lg:gap-8 justify-items-center">
+
+        <!-- Foto 1 -->
+        <div class="polaroid-card group -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-pink"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto1.jpeg" alt="Foto 1" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 2 -->
+        <div class="polaroid-card group rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-yellow"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto2.jpeg" alt="Foto 2" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 3 -->
+        <div class="polaroid-card group -rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-pink"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto3.jpeg" alt="Foto 3" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 4 -->
+        <div class="polaroid-card group rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-yellow"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto4.jpeg" alt="Foto 4" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 5 -->
+        <div class="polaroid-card group -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-pink"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto5.jpeg" alt="Foto 5" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 6 -->
+        <div class="polaroid-card group rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-yellow"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto6.jpeg" alt="Foto 6" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 7 -->
+        <div class="polaroid-card group -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-pink"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto7.jpeg" alt="Foto 7" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 8 -->
+        <div class="polaroid-card group rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-yellow"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto8.jpeg" alt="Foto 8" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 9 -->
+        <div class="polaroid-card group -rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-pink"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto9.jpeg" alt="Foto 9" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 10 -->
+        <div class="polaroid-card group rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-yellow"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto10.jpeg" alt="Foto 10" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 11 -->
+        <div class="polaroid-card group -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-pink"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto11.jpeg" alt="Foto 11" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 12 -->
+        <div class="polaroid-card group rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-yellow"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto12.jpeg" alt="Foto 12" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 13 -->
+        <div class="polaroid-card group -rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-pink"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto13.jpeg" alt="Foto 13" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 14 -->
+        <div class="polaroid-card group rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-yellow"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto14.jpeg" alt="Foto 14" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 15 -->
+        <div class="polaroid-card group -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div class="washi-tape tape-pink"></div>
+          <div class="polaroid-inner bg-white p-2.5 rounded-2xl shadow-lg hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 aspect-[4/3] sm:aspect-square relative">
+              <img src="foto15.jpeg" alt="Foto 15" loading="lazy" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. BUKTI NYUMBANG SECTION -->
+    <div class="max-w-xl mx-auto px-4 pt-10 pb-12 text-center relative z-10">
+      
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-100 border border-pink-200 text-pink-700 text-xs font-bold uppercase tracking-wider mb-3">
+        <span>💸 Bukti Nyumbang</span>
+      </div>
+
+      <p class="text-xs sm:text-sm text-slate-600 mb-6 font-medium italic max-w-md mx-auto leading-relaxed">
+        "iki yo maa di catet, cpns ini sudah nyumbang. maaf tidak banyak, soale masih mempertahankan siang gyukaku malam sushi tei"
+      </p>
+
+      <!-- Foto Bukti -->
+      <div class="flex justify-center">
+        <div class="polaroid-card group rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-pointer max-w-xs sm:max-w-sm">
+          <div class="washi-tape tape-yellow"></div>
+          <div class="polaroid-inner bg-white p-3 rounded-2xl shadow-xl hover:shadow-2xl border border-pink-100 transition-shadow">
+            <div class="overflow-hidden rounded-xl bg-pink-50 relative">
+              <img 
+                src="bukti.jpeg" 
+                alt="Bukti Nyumbang" 
+                loading="lazy" 
+                class="w-full h-auto object-cover rounded-lg group-hover:scale-105 transition-transform duration-500" 
+              />
+              <div class="photo-overlay">🔍 Perbesar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 5. INTERACTIVE ENVELOPE GIFT SECTION (PINK & ROSE EDITION) -->
+    <div class="max-w-2xl mx-auto px-4 pt-4 pb-16 text-center relative z-10">
+      
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-100 border border-pink-200 text-pink-700 text-xs font-bold uppercase tracking-wider mb-3">
+        <span>💌 Sebuah Kejutan Terakhir</span>
+      </div>
+
+      <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
+        Ada Surat Khusus Untukmu, Lism 💖
+      </h2>
+      <div class="mb-8"></div>
+
+      <!-- 3D Interactive Animated Envelope (Soft Pink Theme) -->
+      <div class="flex justify-center">
+        <div id="envelope-wrapper" class="envelope-container cursor-pointer group select-none">
+          
+          <div class="envelope relative w-72 sm:w-80 h-44 sm:h-48 bg-gradient-to-b from-pink-400 to-rose-500 rounded-b-2xl shadow-[0_20px_45px_rgba(251,113,133,0.35)] border-2 border-pink-300 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+            
+            <!-- Envelope Flap (Triangle Top) -->
+            <div id="envelope-flap" class="envelope-flap absolute top-0 left-0 w-full h-0 border-l-[144px] sm:border-l-[160px] border-l-transparent border-r-[144px] sm:border-r-[160px] border-r-transparent border-t-[90px] sm:border-t-[100px] border-t-pink-500 origin-top transition-transform duration-500 z-30"></div>
+            
+            <!-- Letter Peeking Out -->
+            <div id="envelope-paper-peek" class="absolute w-60 sm:w-68 h-28 bg-white rounded-t-xl shadow-md -top-2 z-10 transition-all duration-500 flex flex-col items-center justify-start pt-3 px-4 border border-pink-100">
+              <div class="w-12 h-1.5 bg-pink-300 rounded-full mb-2"></div>
+            </div>
+
+            <!-- Envelope Pocket Front Cover -->
+            <div class="absolute inset-0 z-20 pointer-events-none">
+              <div class="w-full h-full border-b-[176px] sm:border-b-[192px] border-b-rose-600 border-l-[144px] sm:border-l-[160px] border-l-transparent border-r-[144px] sm:border-r-[160px] border-r-transparent rounded-b-2xl"></div>
+            </div>
+
+            <!-- Wax Seal Button (Gold/Heart Stamp) -->
+            <div id="wax-seal" class="absolute z-40 w-14 h-14 rounded-full bg-gradient-to-br from-amber-300 via-amber-400 to-amber-500 border-2 border-white shadow-xl flex items-center justify-center text-rose-700 text-xl font-bold transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+              <span>💖</span>
+            </div>
+
+          </div>
+
+          <p class="mt-4 text-xs font-bold text-pink-600 tracking-wide animate-pulse">
+            ✨ Klik untuk Buka Surat ✨
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- 5. LETTER POPUP MODAL (SURAT PANJANG SPESIAL SOFI)             -->
+  <!-- ============================================================== -->
+  <div id="letter-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden items-center justify-center p-4 transition-opacity duration-400">
+    
+    <div class="relative w-full max-w-2xl bg-white text-slate-800 rounded-3xl shadow-2xl p-6 sm:p-10 border-4 border-pink-300 max-h-[85vh] overflow-y-auto transform scale-95 transition-all duration-300" id="letter-modal-card">
+      
+      <!-- Close Button -->
+      <button id="btn-close-letter" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-pink-100 text-pink-600 hover:bg-pink-200 hover:scale-110 flex items-center justify-center transition-all shadow-sm font-bold text-sm">
+        ✕
+      </button>
+
+      <!-- Letter Header -->
+      <div class="text-center pb-6 border-b border-pink-100 mb-6">
+        <div class="text-3xl mb-1">📜</div>
+        <span class="text-xs font-fredoka tracking-widest text-pink-500 font-bold uppercase">A Special Message for You</span>
+        <h3 class="text-2xl sm:text-3xl font-fredoka font-bold text-pink-600 mt-1">
+          Untuk Lisma, Ibu aku saat di Jakarta ✨
+        </h3>
+      </div>
+
+      <!-- Letter Body Text -->
+      <div class="font-quicksand text-sm sm:text-base text-slate-700 space-y-4 leading-relaxed font-medium">
+        
+        <p>
+          <strong>Halo ma,</strong> agak alay tp izinkan MBTI dengan F mentok ini memberikan kata kata. soale pas nikahanmu aku raiso speech diatas panggung 😊
+        </p>
+
+        <p>
+          maa jujur terharu dirimu sudah nikah. gatau yahh, I was so happy when I first heard from you. yaa meski dah ketebak lu pasti cepet nikahnya.
+        </p>
+
+        <p>
+          hmm pertama-tama makasih yaa pas waktu aku kuliah kita main lagi sama fattah dan ashari. jujur pas itu ngerasa lagi stuck dan butuh bgtt temen yang beneran seumuran. kehadiran kalian memulihkan mental anak stis cantik ini hehe. yang kedua, sumpah maa kek ada sedihnya pula kamu nikah. besok masi bisa main kan kitaa? tp as temenan yang kek kmren kmren, gamau bahas kehidupan dewasaa. oiyaa kamu dulu janji ngasih kado aku pas wisudaa mana bjirr sampai bangkotan ga dikasi kasi, kecewa siii. ga ga ga becandaa aja wkwkwkw.
+        </p>
+
+        <p>
+          inget bgttt pas 2021 akhir aku main ke rumahmu gasii. karena apaya itu lupaa. pokoknya pertama kali kamu certain calonmu ini. anjirlah dr aslab jadi belahan jiwa, masok pak ekoo.
+        </p>
+
+        <p>
+          pokoknya doa terbaik ya buat kalian, semoga suamimu ga nyesel nikahin kamu wkwkw. semoga niat baik untuk beribadah terpanjang ini jadi berkah buat keluarga kalian yahh. meski cpns ini gabisa ambil cuti dan datang ke nikahan kalian, awas aja pas di nikahanku ga datang!!! doain juga ya aku bisa juga sampai di titik seperti kalian untuk nikah suatu hari nanti, doain jodoh sofi segera di perdekat wkwkw. suatu saat kalau aku nikah tolong peluk aku ya maa, karena aku pernah se hopeless itu. pokoknyaa terharu bgtt maa. tetep jadi temenku yah maa, di kehidupan dewasa ini yang semakin menipis pertemanannya, tetep inget aku yh maa. tetep bertukar kabar dengan aku, kawal terus sofi menuju 55kg. ihhh pengen nangiss, tterharu ☹
+        </p>
+
+        <!-- Signature -->
+        <div class="pt-6 text-right">
+          <p class="text-xs uppercase tracking-wider text-slate-400">Dari teman tercantikmu</p>
+          <p class="font-fredoka font-bold text-lg text-pink-600 mt-1">Sofi Zamzanah 🌸</p>
+        </div>
+
+      </div>
+
+      <!-- Bottom Button inside modal -->
+      <div class="mt-8 text-center pt-4 border-t border-pink-100">
+        <button id="btn-close-letter-bottom" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-fredoka font-bold text-sm shadow-md hover:scale-105 transition-all">
+          Simpan Pesan di Hati 💖
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 6. PHOTO ZOOM LIGHTBOX MODAL                                   -->
+  <!-- ============================================================== -->
+  <div id="photo-modal" style="display:none" class="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 select-none">
+    <div class="relative max-w-3xl w-full flex flex-col items-center pointer-events-auto">
+      <button id="btn-close-photo" class="absolute -top-12 right-0 sm:right-2 text-white/90 hover:text-white bg-white/20 hover:bg-rose-500/80 px-4 py-1.5 rounded-full text-sm font-fredoka font-bold transition-all flex items-center gap-1.5 shadow-lg">
+        ✕ Tutup
+      </button>
+      <img id="photo-modal-img" src="" alt="Zoomed Photo" class="max-h-[75vh] w-auto rounded-2xl shadow-2xl border-4 border-white object-contain" />
+      <p id="photo-modal-caption" class="mt-4 text-white font-fredoka text-base sm:text-lg text-center font-semibold"></p>
+    </div>
+  </div>
+
+  <!-- Hidden YouTube & Local Audio Players -->
+  <div id="yt-player" class="fixed -bottom-96 -left-96 pointer-events-none opacity-0 w-1 h-1"></div>
+  <audio id="local-audio" src="lagu.mp3" preload="auto" loop></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
